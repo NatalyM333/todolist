@@ -1,0 +1,100 @@
+
+       {{IndexAuth user}}
+        <script>
+            function Gettasks() {
+                $.ajax({
+                    url: "/api/tasks",
+                    type: "GET",
+                   
+                    success: function(tasks) {
+                        var row_table = '';
+                      
+                      $.each(tasks[0], function(index, task){
+                        row_table += row(task);
+                       });
+                        $('table tbody').append(row_table);
+                    }
+                })
+            }
+
+            $("form").submit(function(event){
+                event.preventDefault();
+                var id = this.elements["id"].value;
+                var name = this.elements["name"].value;
+                var description = this.elements["description"].value;
+                if(id == -1 ) {
+                   $.ajax({
+                        url: "api/tasks",
+                        contentType: "application/json",
+                        method: "POST",
+                        data: JSON.stringify({
+                            name:name,
+                            description: description
+                        }),
+                        success: function(task) {
+                          console.log(task);
+                            $('table tbody').append(row(task));
+                        }
+                    })
+                } else   {
+                    $.ajax({
+                        url: "api/tasks",
+                        contentType: "application/json",
+                        method: "PUT",
+                        data: JSON.stringify({
+                            id: id,
+                            name:name,
+                            description:description
+                        }),
+                        success: function(task) {
+                            console.log(task);
+                            
+                            $(`#name${task.id}`).text(task.name);
+                            $(`#description${task.id}`).text(task.description);
+                        }
+                    })
+                }
+            });
+            $('body').on("click",'.edit', function(){
+                var id = $(this).data('id');
+                $.ajax({
+                    url: "api/tasks/" + id,
+                    type: "GET",
+                  
+                    success: function(task) {
+                       // task = JSON.parse(task);
+                        var form = document.forms['taskForm'];
+                        form.elements['id'].value = task.id;
+                        form.elements['description'].value = task.description;
+                        form.elements['name'].value = task.name;
+                    }
+                })
+            })
+            $('body').on("click",'.delete', function(){
+                var id = $(this).data('id');
+                $.ajax({
+                    url: "api/tasks/" + id,
+                    method: "delete",
+                   
+                    success: function(task_id) {
+                        $(`#td${id}`).remove();
+                    }
+                })
+            })
+            function row(task){
+                return  `<tr id="td${task._id}">
+                                        <td>${task._id}</td>
+                                       
+                                        <td id="name${task._id}">${task.name}</td>
+                                         <td id="description${task._id}">${task.description}</td>
+                                        <td>
+                                            <a data-id="${task._id}" class="edit" > Edit </a>
+                                        </td>
+                                        <td>
+                                            <a data-id="${task._id}" class="delete" > Delete </a>
+                                        </td>
+                                    </tr>`;
+            }
+            Gettasks();
+        </script>
+     

@@ -1,0 +1,26 @@
+
+    <form action="/login" method="POST" >
+        <input type="text" name='name'>
+        <input type="password" name='password'>
+        <button id="but" type="submit">login</button>
+    </form>
+    
+    <script>
+     $("form").submit(function(event){
+        event.preventDefault();
+
+        var name = this.elements["name"].value;
+        var password = this.elements["password"].value;
+        console.log(name);
+                $.ajax({
+                        url: "api/users",
+                        contentType: "application/json",
+                        method: "POST",
+                        data: JSON.stringify({
+                            name:name,
+                            password:password
+                        }),
+                     
+                    });       
+     });
+</script>
